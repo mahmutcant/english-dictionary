@@ -1,10 +1,13 @@
-import { View, Text, TextInput, StyleSheet, Dimensions, Pressable, FlatList, ScrollView, TouchableHighlight, ActivityIndicator } from 'react-native'
+import { View, Text, TextInput, StyleSheet, Dimensions, Pressable, FlatList, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
-import { SearchIcon } from '../../../Icons'
+import { ArrowLeft, ArrowRight, ClearIcon, SearchIcon } from '../../../Icons'
 import { autoComplete, getInformationByWord } from '../../services/SearchService'
 import debounce from "lodash.debounce";
 import { AutoComplete, WordDetail } from '../../models/AutoComplete';
-
+import { ref, set } from 'firebase/database';
+import { FIREBASE_AUTH, FIRESTORE_RT_DB } from '../../../FirebaseConfig';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import SearchResultContainer from '../../common/SearchResultContainer';
 const Search = () => {
     const [search, setSearch] = useState<string>("")
     const [searchResult, setSearchResult] = useState<AutoComplete[] | null>([]);
@@ -12,6 +15,8 @@ const Search = () => {
     const [selectedWord, setSelectedWord] = useState<string>("")
     const [wordDetail, setWordDetail] = useState<WordDetail>();
     const [loading, setLoading] = useState<boolean>(false)
+    const [indexOfExampleSentences, setIndexOfExampleSentences] = useState(0);
+    
     const debouncedSearch = useCallback(
         debounce((searchTerm) => {
             autoComplete(searchTerm)
@@ -36,46 +41,45 @@ const Search = () => {
             setWordDetail(data);
         }).catch(error => { setLoading(false); console.log(error); })
     }
-    return (
-        <ScrollView>
-            <View style={{ position: "relative", marginTop: 20 }}>
-                <TextInput value={search} onFocus={() => setIsItemSelected(false)} onChangeText={(text) => setSearch(text)} style={[styles.search, (isItemSelected || !searchResult) && { borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }]}
-                    cursorColor="#000"></TextInput>
-                <View style={{ position: "absolute", marginTop: 42, marginLeft: 40 }}><SearchIcon /></View>
+    const handlePrevious = () => {
+        if (indexOfExampleSentences > 0) {
+            setIndexOfExampleSentences(indexOfExampleSentences - 1);
+        }
+    };
 
-                {!isItemSelected && searchResult && <ScrollView style={styles.searchResultContainer}>
-                    {searchResult.map((item) => (
-                        <Pressable onPress={() => {
-                            setIsItemSelected(true)
-                            setSelectedWord(item.word)
-                            getInformation(item.word)
-                            setSearch(item.word)
-                        }} style={styles.item} key={item.word}>
-                            <Text>{item.word}</Text>
-                        </Pressable>
-                    ))}
-                </ScrollView>}
-                {(loading) ? <ActivityIndicator size={70} color={"#999999"} /> : selectedWord && (
-                    <View style={styles.selectedWordContainer}>
-                        <View style={styles.selectedWordContext}>
-                            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                                <Text style={{ fontWeight: "bold", fontSize: 20 }}>{selectedWord}</Text>
-                                {wordDetail?.level && <View style={{ backgroundColor: "#FEC400", padding: 10, borderRadius: 40 }}><Text style={{ fontWeight: "900", fontSize: 25 }}>{wordDetail?.level}</Text></View>}
-                            </View>
-                            <Text style={{ fontSize: 20, marginTop: 20 }}>{wordDetail?.title.split(":")[0]}</Text>
-                            {wordDetail?.example_sentences && (
-                                <View style={{ marginVertical: 20 }}>
-                                    <Text style={{ fontWeight: "bold", fontSize: 18 }}>Example Sentences</Text>
-                                    {wordDetail?.example_sentences.map((item) => (
-                                        <Text style={{ marginTop: 10 }}>{item}</Text>
-                                    ))}
-                                </View>
-                            )}
-                        </View>
-                    </View>
-                )}
-            </View>
-        </ScrollView>
+    const handleNext = () => {
+        if (indexOfExampleSentences < wordDetail!.example_sentences.length - 1) {
+            setIndexOfExampleSentences(indexOfExampleSentences + 1);
+        }
+    };
+    
+    return (
+        <KeyboardAvoidingView behavior="height" style={{flex:1}}>
+            <ScrollView keyboardShouldPersistTaps="always">
+                <View style={{ position: "relative", marginTop: 20 }}>
+                    <TextInput value={search} onFocus={() => setIsItemSelected(false)} onChangeText={(text) => setSearch(text)} style={[styles.search, (isItemSelected || !searchResult) && { borderBottomLeftRadius: 30, borderBottomRightRadius: 30, marginBottom: 10 }]}
+                        cursorColor="#000"></TextInput>
+                    <View style={{ position: "absolute", marginTop: 42, marginLeft: 40 }}><SearchIcon /></View>
+                    {search &&  <Pressable onPress={() => setSearch("")} style={{ position: "absolute", marginTop: 42, right: 50 }}><ClearIcon /></Pressable>}
+
+                    {!isItemSelected && searchResult && <ScrollView style={styles.searchResultContainer}>
+                        {searchResult.map((item) => (
+                            <Pressable onPress={() => {
+                                setIsItemSelected(true)
+                                setSelectedWord(item.word)
+                                getInformation(item.word)
+                                setSearch(item.word)
+                            }} style={styles.item} key={item.word}>
+                                <Text>{item.word}</Text>
+                            </Pressable>
+                        ))}
+                    </ScrollView>}
+                    {(loading) ? <ActivityIndicator size={70} color={"#999999"} /> : selectedWord && (
+                        <SearchResultContainer selectedWord={selectedWord} wordDetail={wordDetail}/>
+                    )}
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     )
 }
 
@@ -142,5 +146,18 @@ const styles = StyleSheet.create({
     },
     selectedWordContext: {
         margin: 30
-    }
+    },
+    container: {
+        flexDirection: 'row',
+        width: Dimensions.get('screen').width - 100,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 10,
+        marginTop: 20
+    },
+    text: {
+        marginHorizontal: 10,
+        textAlign: 'center',
+        flex: 1, // Text'i ortalamak için
+    },
 })

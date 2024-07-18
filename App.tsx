@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import Login from './app/screens/Login';
 import Main from './app/screens/Main';
 import { useEffect, useState } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged, signInWithEmailAndPassword, User } from 'firebase/auth';
 import { FIREBASE_AUTH } from './FirebaseConfig';
 import { ExamIcon, HomeIcon, ReportsIcon, SettingsIcon } from './Icons';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
@@ -11,6 +11,7 @@ import EducationContext from './app/screens/EducationContext/EducationContext';
 import MainPage from './app/screens/MainPage/MainPage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Platform, StatusBar } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
 function InsideLayout() {
@@ -46,6 +47,31 @@ function InsideLayout() {
 }
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
+  const auth = FIREBASE_AUTH;
+  interface LSInfo {
+    email: string,
+    password: string
+}
+  const redirectLogin = async() => {
+    try {
+        const userInfoString = await AsyncStorage.getItem("user-info");
+        if (userInfoString !== null) {
+          const lsInfo: LSInfo = JSON.parse(userInfoString);
+          const lsEmail = lsInfo.email;
+          const lsPassword = lsInfo.password;
+          try{
+            const response = await signInWithEmailAndPassword(auth,lsEmail,lsPassword);
+          }catch(error) {
+            console.error("hata : ", error)
+          }
+        }
+      } catch (error) {
+        console.error("Kullanıcı bilgileri alınamadı:", error);
+      }
+}
+useEffect(() => {
+    redirectLogin()
+}, [])
   useEffect(() => {
     onAuthStateChanged(FIREBASE_AUTH, (user) => {
       setUser(user)

@@ -1,11 +1,13 @@
 import { View, Text, StyleSheet, TextInput, ActivityIndicator, Button, Alert, KeyboardAvoidingView, Dimensions, TouchableOpacity, TouchableHighlight, Pressable } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FIREBASE_AUTH, FIRESTORE_RT_DB } from '../../FirebaseConfig';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { EyeIcon, FacebookIcon, GoogleIcon } from '../../Icons';
 import { child, push, ref, set } from "firebase/database";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const screenWidth = Dimensions.get('window').width
 const Login = () => {
+    
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [loading, setLoading] = useState(false)
@@ -17,6 +19,11 @@ const Login = () => {
         setLoading(true);
         try {
             const response = await signInWithEmailAndPassword(auth, email, password);
+            const userInfo = {
+                email: email,
+                password: password
+            };
+            await AsyncStorage.setItem("user-info", JSON.stringify(userInfo))
         } catch (error) {
             console.log(error);
             alert("Authorization Failed", "Email or password is incorrect")
@@ -24,7 +31,7 @@ const Login = () => {
             setLoading(false);
         }
     }
-
+    
     const signUp = async () => {
         setLoading(true)
         try {
