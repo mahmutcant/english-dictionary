@@ -50,7 +50,7 @@ const Search = () => {
                             setSelectedWord(item.word)
                             getInformation(item.word)
                             setSearch(item.word)
-                        }} style={styles.item}>
+                        }} style={styles.item} key={item.word}>
                             <Text>{item.word}</Text>
                         </Pressable>
                     ))}
@@ -71,11 +71,6 @@ const Search = () => {
                                     ))}
                                 </View>
                             )}
-                            {wordDetail?.synonyms.map((item) => (
-                                <View>
-                                    <Text>{item}</Text>
-                                </View>
-                            ))}
                         </View>
                     </View>
                 )}
