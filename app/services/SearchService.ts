@@ -1,6 +1,6 @@
 import axios from "axios";
 import { AutoComplete, WordDetail } from "../models/AutoComplete";
-const baseUrl = "http://18.208.130.255:8000/scrape/"
+const baseUrl = "https://web-scraping-dictionary.onrender.com/scrape/"
 export const autoComplete = async(word: string):Promise<AutoComplete[]> => {
     try {
         const response = await axios.get(`https://dictionary.cambridge.org/autocomplete/amp?dataset=english&q=${word}&__amp_source_origin=https%3A%2F%2Fdictionary.cambridge.org`)
@@ -14,7 +14,7 @@ const MAX_RETRIES = 3;
 
 const axiosInstance = axios.create({
     baseURL: baseUrl,
-    timeout: 10000,
+    timeout: 120000,
 });
 
 axiosInstance.interceptors.response.use(null, async (error) => {
