@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { FIREBASE_AUTH, FIRESTORE_RT_DB } from '../../../FirebaseConfig';
 import { get, onValue, ref, remove } from 'firebase/database';
 import { ClearIcon } from '../../../Icons';
-interface EducationContextModel {
+export interface EducationContextModel {
   [key: string]: {
     level: string,
     word: string,
@@ -32,10 +32,9 @@ const EducationContext = () => {
   }).catch((err: any) => console.log(err))}
 
   return (
-    <ScrollView style={{marginBottom:0}}>
+    <ScrollView>
       {educationContext && Object.keys(educationContext).map((key) => (
         <View style={styles.selectedWordContainer}>
-          
           <View style={styles.selectedWordContext}>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
               <Text style={{ fontWeight: "bold", fontSize: 20 }}>{key}</Text>
@@ -46,7 +45,6 @@ const EducationContext = () => {
               )}
             </View>
             <Text style={{ fontSize: 20, marginTop: 20 }}>{educationContext[key].word}</Text>
-            
           </View>
           <Pressable onPress={() => removeFromEducationContext(key)}>
             <View style={styles.addToWordList}>
