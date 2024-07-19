@@ -1,16 +1,15 @@
 import { View, Text, StyleSheet, Dimensions, Pressable } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { WordDetail } from '../models/AutoComplete'
-import { ArrowLeft, ArrowRight } from '../../Icons';
+import { ArrowLeft, ArrowRight, ClearIcon } from '../../Icons';
 import { FIREBASE_AUTH, FIRESTORE_RT_DB } from '../../FirebaseConfig';
 import { ref, set } from 'firebase/database';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 type SearchResultContainerProps = {
     selectedWord: string;
     wordDetail?: WordDetail;
+    isHistory: boolean;
 };
-
-const SearchResultContainer: React.FC<SearchResultContainerProps> = ({selectedWord,wordDetail}) => {
+const SearchResultContainer: React.FC<SearchResultContainerProps> = ({selectedWord,wordDetail,isHistory}) => {
     const [indexOfExampleSentences, setIndexOfExampleSentences] = useState(0);
     
     const db = FIRESTORE_RT_DB;
@@ -38,7 +37,11 @@ const SearchResultContainer: React.FC<SearchResultContainerProps> = ({selectedWo
     return (
         wordDetail && (
             <View style={styles.selectedWordContainer}>
+                {isHistory && <View style={{alignSelf:"flex-end",margin:10}}>
+                    <ClearIcon/>
+                </View>}
             <View style={styles.selectedWordContext}>
+                
                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                     <Text style={{ fontWeight: "bold", fontSize: 20 }}>{selectedWord}</Text>
                     {wordDetail?.level && <View style={{ backgroundColor: "#FEC400", padding: 10, borderRadius: 40 }}><Text style={{ fontWeight: "900", fontSize: 25 }}>{wordDetail?.level}</Text></View>}
@@ -59,6 +62,7 @@ const SearchResultContainer: React.FC<SearchResultContainerProps> = ({selectedWo
                     </View>
                 )}
             </View>
+            
             <Pressable onPress={saveToWordList}>
                 <View style={{ justifyContent: "center", alignItems: "center", margin: 10, padding: 10, backgroundColor: "#4A3AFF", borderRadius: 50 }}>
                     <Text style={{ color: "#fff", fontWeight: "bold" }}>Add to word list</Text>

@@ -1,22 +1,41 @@
 import { View, Text, TextInput, StyleSheet, Dimensions, Pressable, FlatList, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
-import { ArrowLeft, ArrowRight, ClearIcon, SearchIcon } from '../../../Icons'
+import { ClearIcon, HistoryIcon, SearchIcon } from '../../../Icons'
 import { autoComplete, getInformationByWord } from '../../services/SearchService'
 import debounce from "lodash.debounce";
-import { AutoComplete, WordDetail } from '../../models/AutoComplete';
-import { ref, set } from 'firebase/database';
-import { FIREBASE_AUTH, FIRESTORE_RT_DB } from '../../../FirebaseConfig';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AutoComplete, HistoryWordDetail, WordDetail } from '../../models/AutoComplete';
 import SearchResultContainer from '../../common/SearchResultContainer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Search = () => {
     const [search, setSearch] = useState<string>("")
     const [searchResult, setSearchResult] = useState<AutoComplete[] | null>([]);
     const [isItemSelected, setIsItemSelected] = useState(true);
     const [selectedWord, setSelectedWord] = useState<string>("")
     const [wordDetail, setWordDetail] = useState<WordDetail>();
+    const [history, setHistory] = useState<HistoryWordDetail>({})
     const [loading, setLoading] = useState<boolean>(false)
-    const [indexOfExampleSentences, setIndexOfExampleSentences] = useState(0);
-    
+    const getHistory = async () => {
+        try {
+            const searchHistory = await AsyncStorage.getItem("search-history");
+            if (searchHistory !== null) {
+                setHistory(JSON.parse(searchHistory))
+            }
+        } catch (error) {
+            console.error("Geçmiş Bilgisi Alınamadı", error);
+        }
+    }
+    const saveHistory = async () => {
+        if (wordDetail) {
+            setHistory(prevHistory => ({
+                [search]: wordDetail,
+                ...history
+            }));
+        }
+    }
+    useEffect(() => {
+        saveHistory()
+    }, [wordDetail])
+
     const debouncedSearch = useCallback(
         debounce((searchTerm) => {
             autoComplete(searchTerm)
@@ -41,27 +60,15 @@ const Search = () => {
             setWordDetail(data);
         }).catch(error => { setLoading(false); console.log(error); })
     }
-    const handlePrevious = () => {
-        if (indexOfExampleSentences > 0) {
-            setIndexOfExampleSentences(indexOfExampleSentences - 1);
-        }
-    };
 
-    const handleNext = () => {
-        if (indexOfExampleSentences < wordDetail!.example_sentences.length - 1) {
-            setIndexOfExampleSentences(indexOfExampleSentences + 1);
-        }
-    };
-    
     return (
-        <KeyboardAvoidingView behavior="height" style={{flex:1}}>
+        <KeyboardAvoidingView behavior="height" style={{ flex: 1 }}>
             <ScrollView keyboardShouldPersistTaps="always">
                 <View style={{ position: "relative", marginTop: 20 }}>
                     <TextInput value={search} onFocus={() => setIsItemSelected(false)} onChangeText={(text) => setSearch(text)} style={[styles.search, (isItemSelected || !searchResult) && { borderBottomLeftRadius: 30, borderBottomRightRadius: 30, marginBottom: 10 }]}
                         cursorColor="#000"></TextInput>
                     <View style={{ position: "absolute", marginTop: 42, marginLeft: 40 }}><SearchIcon /></View>
-                    {search &&  <Pressable onPress={() => setSearch("")} style={{ position: "absolute", marginTop: 42, right: 50 }}><ClearIcon /></Pressable>}
-
+                    {search && <Pressable onPress={() => setSearch("")} style={{ position: "absolute", marginTop: 42, right: 50 }}><ClearIcon /></Pressable>}
                     {!isItemSelected && searchResult && <ScrollView style={styles.searchResultContainer}>
                         {searchResult.map((item) => (
                             <Pressable onPress={() => {
@@ -75,9 +82,18 @@ const Search = () => {
                         ))}
                     </ScrollView>}
                     {(loading) ? <ActivityIndicator size={70} color={"#999999"} /> : selectedWord && (
-                        <SearchResultContainer selectedWord={selectedWord} wordDetail={wordDetail}/>
+                        <SearchResultContainer selectedWord={selectedWord} wordDetail={wordDetail} isHistory={false}/>
                     )}
                 </View>
+                {history && <View style={{margin:50}}>
+                    <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between"}}><HistoryIcon/>
+                    <Text style={{fontWeight:"bold",fontSize:20}}>Historical Searches</Text>
+                    <View></View>
+                    </View>
+                    {Object.keys(history).filter(key => key && (key !== selectedWord)).map((key: string) =>
+                        <SearchResultContainer selectedWord={key} wordDetail={history[key]} key={key} isHistory={true}/>
+                    )}
+                </View>}
             </ScrollView>
         </KeyboardAvoidingView>
     )
@@ -126,38 +142,8 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 30,
         padding: 10
     },
-    separator: {
-        height: 1,
-        width: '100%',
-        backgroundColor: '#ccc',
-    },
     item: {
         padding: 20,
         backgroundColor: '#fff',
-    },
-    selectedWordContainer: {
-        width: Dimensions.get("screen").width - 50,
-        alignSelf: "center",
-        backgroundColor: "#fff",
-        borderRadius: 30,
-        borderWidth: 2,
-        borderColor: "#4A3AFF",
-        marginTop: 30
-    },
-    selectedWordContext: {
-        margin: 30
-    },
-    container: {
-        flexDirection: 'row',
-        width: Dimensions.get('screen').width - 100,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 10,
-        marginTop: 20
-    },
-    text: {
-        marginHorizontal: 10,
-        textAlign: 'center',
-        flex: 1, // Text'i ortalamak için
     },
 })

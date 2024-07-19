@@ -8,3 +8,7 @@ export interface WordDetail {
     synonyms: string[]
     title: string
 }
+
+export interface HistoryWordDetail {
+    [title: string]: WordDetail,
+}
