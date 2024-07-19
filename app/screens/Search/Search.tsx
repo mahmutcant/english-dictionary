@@ -5,7 +5,7 @@ import { autoComplete, getInformationByWord } from '../../services/SearchService
 import debounce from "lodash.debounce";
 import { AutoComplete, HistoryWordDetail, WordDetail } from '../../models/AutoComplete';
 import SearchResultContainer from '../../common/SearchResultContainer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const Search = () => {
     const [search, setSearch] = useState<string>("")
     const [searchResult, setSearchResult] = useState<AutoComplete[] | null>([]);
@@ -14,16 +14,7 @@ const Search = () => {
     const [wordDetail, setWordDetail] = useState<WordDetail>();
     const [history, setHistory] = useState<HistoryWordDetail>({})
     const [loading, setLoading] = useState<boolean>(false)
-    const getHistory = async () => {
-        try {
-            const searchHistory = await AsyncStorage.getItem("search-history");
-            if (searchHistory !== null) {
-                setHistory(JSON.parse(searchHistory))
-            }
-        } catch (error) {
-            console.error("Geçmiş Bilgisi Alınamadı", error);
-        }
-    }
+    
     const saveHistory = async () => {
         if (wordDetail) {
             setHistory(prevHistory => ({
@@ -32,6 +23,15 @@ const Search = () => {
             }));
         }
     }
+
+    const removeHistoryItem = (key: string) => {
+        setHistory(prevHistory => {
+          const newHistory = { ...prevHistory };
+          delete newHistory[key];
+          return newHistory;
+        });
+    };
+
     useEffect(() => {
         saveHistory()
     }, [wordDetail])
@@ -53,6 +53,7 @@ const Search = () => {
             setSearchResult(null)
         }
     }, [search]);
+    
     const getInformation = (word: string) => {
         setLoading(true)
         getInformationByWord(word).then((data) => {
@@ -85,13 +86,13 @@ const Search = () => {
                         <SearchResultContainer selectedWord={selectedWord} wordDetail={wordDetail} isHistory={false}/>
                     )}
                 </View>
-                {history && <View style={{margin:50}}>
+                {Object.keys(history).filter(key => key && (key !== selectedWord)).length > 0 && <View style={{margin:50}}>
                     <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between"}}><HistoryIcon/>
                     <Text style={{fontWeight:"bold",fontSize:20}}>Historical Searches</Text>
                     <View></View>
                     </View>
                     {Object.keys(history).filter(key => key && (key !== selectedWord)).map((key: string) =>
-                        <SearchResultContainer selectedWord={key} wordDetail={history[key]} key={key} isHistory={true}/>
+                        <SearchResultContainer selectedWord={key} wordDetail={history[key]} key={key} isHistory={true} deleteHistory={removeHistoryItem}/>
                     )}
                 </View>}
             </ScrollView>

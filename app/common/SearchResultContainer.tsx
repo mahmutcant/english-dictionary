@@ -8,8 +8,9 @@ type SearchResultContainerProps = {
     selectedWord: string;
     wordDetail?: WordDetail;
     isHistory: boolean;
+    deleteHistory?: (key: string) => void;
 };
-const SearchResultContainer: React.FC<SearchResultContainerProps> = ({selectedWord,wordDetail,isHistory}) => {
+const SearchResultContainer: React.FC<SearchResultContainerProps> = ({selectedWord,wordDetail,isHistory,deleteHistory}) => {
     const [indexOfExampleSentences, setIndexOfExampleSentences] = useState(0);
     
     const db = FIRESTORE_RT_DB;
@@ -37,11 +38,10 @@ const SearchResultContainer: React.FC<SearchResultContainerProps> = ({selectedWo
     return (
         wordDetail && (
             <View style={styles.selectedWordContainer}>
-                {isHistory && <View style={{alignSelf:"flex-end",margin:10}}>
+                {(isHistory && deleteHistory) && <Pressable onPress={() => deleteHistory(selectedWord)} style={{alignSelf:"flex-end",margin:10}}>
                     <ClearIcon/>
-                </View>}
+                </Pressable>}
             <View style={styles.selectedWordContext}>
-                
                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                     <Text style={{ fontWeight: "bold", fontSize: 20 }}>{selectedWord}</Text>
                     {wordDetail?.level && <View style={{ backgroundColor: "#FEC400", padding: 10, borderRadius: 40 }}><Text style={{ fontWeight: "900", fontSize: 25 }}>{wordDetail?.level}</Text></View>}
