@@ -66,7 +66,8 @@ const Search = () => {
         <KeyboardAvoidingView behavior="height" style={{ flex: 1 }}>
             <ScrollView keyboardShouldPersistTaps="always">
                 <View style={{ position: "relative", marginTop: 20 }}>
-                    <TextInput value={search} onFocus={() => setIsItemSelected(false)} onChangeText={(text) => setSearch(text)} style={[styles.search, (isItemSelected || !searchResult) && { borderBottomLeftRadius: 30, borderBottomRightRadius: 30, marginBottom: 10 }]}
+                    <TextInput value={search} onFocus={() => setIsItemSelected(false)} onChangeText={(text) => setSearch(text)} style={[styles.search, 
+                        (isItemSelected || !searchResult) && { borderBottomLeftRadius: 30, borderBottomRightRadius: 30, marginBottom: 10 }]}
                         cursorColor="#000"></TextInput>
                     <View style={{ position: "absolute", marginTop: 42, marginLeft: 40 }}><SearchIcon /></View>
                     {search && <Pressable onPress={() => setSearch("")} style={{ position: "absolute", marginTop: 42, right: 50 }}><ClearIcon /></Pressable>}
@@ -87,9 +88,8 @@ const Search = () => {
                     )}
                 </View>
                 {Object.keys(history).filter(key => key && (key !== selectedWord)).length > 0 && <View style={{margin:50}}>
-                    <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between"}}><HistoryIcon/>
+                    <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-evenly"}}><HistoryIcon/>
                     <Text style={{fontWeight:"bold",fontSize:20}}>Historical Searches</Text>
-                    <View></View>
                     </View>
                     {Object.keys(history).filter(key => key && (key !== selectedWord)).map((key: string) =>
                         <SearchResultContainer selectedWord={key} wordDetail={history[key]} key={key} isHistory={true} deleteHistory={removeHistoryItem}/>
@@ -141,7 +141,8 @@ const styles = StyleSheet.create({
         elevation: 9,
         borderBottomLeftRadius: 30,
         borderBottomRightRadius: 30,
-        padding: 10
+        padding: 10,
+        marginBottom:20,
     },
     item: {
         padding: 20,

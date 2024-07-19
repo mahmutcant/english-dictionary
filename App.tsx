@@ -12,6 +12,7 @@ import MainPage from './app/screens/MainPage/MainPage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Platform, StatusBar } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ExamPage from './app/screens/ExamPage/ExamPage';
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
 function InsideLayout() {
@@ -30,7 +31,7 @@ function InsideLayout() {
           return <ReportsIcon />
         })
       }} />
-      <Tab.Screen name="Exam" component={Main} options={{
+      <Tab.Screen name="Exam" component={ExamPage} options={{
         title: "Sınav",
         tabBarIcon: (() => {
           return <ExamIcon />
