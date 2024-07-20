@@ -12,6 +12,7 @@ type SearchResultContainerProps = {
 };
 const SearchResultContainer: React.FC<SearchResultContainerProps> = ({ selectedWord, wordDetail, isHistory, deleteHistory }) => {
     const [indexOfExampleSentences, setIndexOfExampleSentences] = useState(0);
+    const [indexOfTurkishMeans, setIndexOfTurkishMeans] = useState(0);
 
     const db = FIRESTORE_RT_DB;
     const auth = FIREBASE_AUTH;
@@ -26,10 +27,22 @@ const SearchResultContainer: React.FC<SearchResultContainerProps> = ({ selectedW
             setIndexOfExampleSentences(indexOfExampleSentences + 1);
         }
     };
+    const handleMeansPrevious = () => {
+        if (indexOfTurkishMeans > 0) {
+            setIndexOfTurkishMeans(indexOfTurkishMeans - 1);
+        }
+    };
+
+    const handleMeansNext = () => {
+        if (indexOfTurkishMeans < wordDetail!.turkish_means.length - 1) {
+            setIndexOfTurkishMeans(indexOfTurkishMeans + 1);
+        }
+    };
     const saveToWordList = () => {
         set(ref(db, 'users/' + auth.currentUser?.uid + "/education_context/" + selectedWord), {
             word: wordDetail?.title.split(":")[0],
-            level: wordDetail?.level
+            level: wordDetail?.level,
+            means: wordDetail?.turkish_means
         }).then(() => {
 
         }).catch((err: any) => console.log(err))
@@ -50,6 +63,20 @@ const SearchResultContainer: React.FC<SearchResultContainerProps> = ({ selectedW
                         )}
                     </View>
                     <Text style={{ fontSize: 20, marginTop: 20 }}>{wordDetail?.title.split(":")[0]}</Text>
+                    {wordDetail?.turkish_means && wordDetail!.turkish_means.length > 0 && (
+                        <View style={{ marginVertical: 20 }}>
+                            <Text style={{ fontWeight: "bold", fontSize: 18 }}>Turkish Means</Text>
+                            <View style={styles.container}>
+                                <Pressable onPress={handleMeansPrevious}>
+                                    <ArrowLeft />
+                                </Pressable>
+                                <Text style={styles.text}>{wordDetail?.turkish_means[indexOfTurkishMeans]}</Text>
+                                <Pressable onPress={handleMeansNext}>
+                                    <ArrowRight />
+                                </Pressable>
+                            </View>
+                        </View>
+                    )}
                     {wordDetail?.example_sentences && wordDetail!.example_sentences.length > 0 && (
                         <View style={{ marginVertical: 20 }}>
                             <Text style={{ fontWeight: "bold", fontSize: 18 }}>Example Sentences</Text>

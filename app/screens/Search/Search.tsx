@@ -66,7 +66,7 @@ const Search = () => {
         <KeyboardAvoidingView behavior="height" style={{ flex: 1 }}>
             <ScrollView keyboardShouldPersistTaps="always">
                 <View style={{ position: "relative", marginTop: 20 }}>
-                    <TextInput value={search} onFocus={() => setIsItemSelected(false)} onChangeText={(text) => setSearch(text)} style={[styles.search, 
+                    <TextInput autoCapitalize='none' value={search} onFocus={() => setIsItemSelected(false)} onChangeText={(text) => setSearch(text)} style={[styles.search, 
                         (isItemSelected || !searchResult) && { borderBottomLeftRadius: 30, borderBottomRightRadius: 30, marginBottom: 10 }]}
                         cursorColor="#000"></TextInput>
                     <View style={{ position: "absolute", marginTop: 42, marginLeft: 40 }}><SearchIcon /></View>

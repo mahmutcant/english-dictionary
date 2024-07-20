@@ -6,7 +6,8 @@ export interface WordDetail {
     example_sentences: string[],
     level: string,
     synonyms: string[]
-    title: string
+    title: string,
+    turkish_means: string[]
 }
 
 export interface HistoryWordDetail {
