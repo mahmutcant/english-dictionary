@@ -2680,6 +2680,11 @@
   resolved "https://registry.npmjs.org/@react-native-firebase/database/-/database-20.2.1.tgz"
   integrity sha512-GeJ0oSocsy+HFRu7WYY3UQae63PQwF3GdeaDvhbkJpff1ZbLGKtPFnvnLawvxo0HiF3eg/wMNU4DVQjenktKWw==
 
+"@react-native-google-signin/google-signin@^12.2.1":
+  version "12.2.1"
+  resolved "https://registry.npmjs.org/@react-native-google-signin/google-signin/-/google-signin-12.2.1.tgz"
+  integrity sha512-qt2Cb+bN2NS8BBT06M3UbLVS1gaSYTenNh4uZtPNmyJC23xZAynLkuhvsC6gmeEnxcj0wLVUn1Es+LSHw0OhVQ==
+
 "@react-native/assets-registry@0.74.85":
   version "0.74.85"
   resolved "https://registry.npmjs.org/@react-native/assets-registry/-/assets-registry-0.74.85.tgz"
@@ -4506,7 +4511,7 @@ expo-status-bar@~1.12.1:
   resolved "https://registry.npmjs.org/expo-status-bar/-/expo-status-bar-1.12.1.tgz"
   integrity sha512-/t3xdbS8KB0prj5KG5w7z+wZPFlPtkgs95BsmrP/E7Q0xHXTcDcQ6Cu2FkFuRM+PKTb17cJDnLkawyS5vDLxMA==
 
-expo@*, expo@>=47.0.0, expo@~51.0.20:
+expo@*, expo@>=47.0.0, expo@>=50.0.0, expo@~51.0.20:
   version "51.0.20"
   resolved "https://registry.npmjs.org/expo/-/expo-51.0.20.tgz"
   integrity sha512-EmNZel6j7pU4YF1QcIcgpVdYsA1lASQcEw9PPSevjreNT6nlge2CNHB6mAphAKGz5PdgcWYBn/v4qQj1/FJuZQ==

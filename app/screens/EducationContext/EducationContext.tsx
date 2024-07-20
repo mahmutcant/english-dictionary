@@ -47,7 +47,7 @@ const EducationContext = () => {
   return (
     <ScrollView>
       {educationContext && Object.keys(educationContext).map((key) => (
-        <View style={styles.selectedWordContainer}>
+        <View style={styles.selectedWordContainer} key={key}>
           <View style={styles.selectedWordContext}>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
               <Text style={{ fontWeight: "bold", fontSize: 20 }}>{key}</Text>

@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet, TextInput, ActivityIndicator, Button, Alert, KeyboardAvoidingView, Dimensions, TouchableOpacity, TouchableHighlight, Pressable } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, TextInput, ActivityIndicator, Button, Alert, KeyboardAvoidingView, Dimensions, TouchableHighlight, Pressable } from 'react-native'
+import React, { useState } from 'react'
 import { FIREBASE_AUTH, FIRESTORE_RT_DB } from '../../FirebaseConfig';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { EyeIcon, FacebookIcon, GoogleIcon } from '../../Icons';
 import { child, push, ref, set } from "firebase/database";
 import AsyncStorage from '@react-native-async-storage/async-storage';
