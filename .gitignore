@@ -34,3 +34,5 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 your_key_name.keystore
+
+FirebaseConfig.ts
